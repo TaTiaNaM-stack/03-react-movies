@@ -1,15 +1,26 @@
 import type { Movie } from '../types/movie';
 import axios from 'axios'
 
+const VITE_TMDB_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
+
 interface FetchMoviesParams {
   results: Movie[];
-
 }
 
-export default function fetchMovies(): Promise<Movie[]> {
-  return axios
-    .get<FetchMoviesParams>(
-      `https://api.themoviedb.org/3/movie/popular?api_key=${import.meta.env.VITE_TMDB_TOKEN}`
-    )
-    .then((response) => response.data.results);
+export default async function fetchMovies(query?: string): Promise<Movie[]> {
+  const endpoint = query
+    ? `https://api.themoviedb.org/3/search/movie`
+    : `https://api.themoviedb.org/3/movie/popular`;
+
+  const { data } = await axios.get<FetchMoviesParams>(endpoint, {
+    params: {
+      ...(query && { query }),
+      api_key: VITE_TMDB_TOKEN
+    },
+    headers: {
+      Authorization: `Bearer ${VITE_TMDB_TOKEN}`,
+    }
+  });
+
+  return data.results;
 }

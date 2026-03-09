@@ -2,13 +2,14 @@
 import css from './MovieModal.module.css'
 import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
+import type { Movie } from '../../types/movie'
 
 interface MovieModalProps {
-  src: string;
+  movie: Movie;
   onClose: () => void;
 }
 
-export default function MovieModal({ src, onClose }: MovieModalProps) {
+export default function MovieModal({ movie, onClose }: MovieModalProps) {
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
       onClose();
@@ -39,18 +40,18 @@ export default function MovieModal({ src, onClose }: MovieModalProps) {
       &times;
     </button>
     <img
-      src={src}
-      alt="movie_title"
+      src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/500x750?text=No+Image'}
+      alt={movie.title}
       className={css.image}
     />
     <div className={css.content}>
-      <h2>movie_title</h2>
-      <p>movie_overview</p>
+      <h2>{movie.title}</h2>
+      <p>{movie.overview}</p>
       <p>
-        <strong>Release Date:</strong> movie_release_date
+        <strong>Release Date:</strong> {movie.release_date}
       </p>
       <p>
-        <strong>Rating:</strong> movie_vote_average/10
+        <strong>Rating:</strong> {movie.vote_average}/10
       </p>
     </div>
   </div>

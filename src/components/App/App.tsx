@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.module.css'
 import type { Movie } from '../../types/movie'
-import axios from 'axios'
+import fetchMovies from '../../services/movieService';
 import SearchBar from '../SearchBar/SearchBar';
 import MovieGrid from '../MovieGrid/MovieGrid';
 import Loader from '../Loader/Loader';
@@ -9,17 +9,23 @@ import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import MovieModal from '../MovieModal/MovieModal';
 import toast from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
-const VITE_TMDB_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
 
 export default function App() {
   const [error, setError] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
   const [movies, setMovies] = useState<Movie[]>([]);
- const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setIsModalOpen(true);
+  };
 
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedMovie(null);
+  };
   
   const handleSearch = async (query: string) => {
     try {
@@ -27,15 +33,10 @@ export default function App() {
       setError(false);
       setMovies([]);
       
-      const { data } = await axios.get<{results: Movie[]}>(`https://image.tmdb.org/t/p/w500${onselect}`, {
-        params: {
-          query: query,
-          api_key: VITE_TMDB_TOKEN
-        }
-      });
+      const results = await fetchMovies(query);
       
-      setMovies(data.results);
-      if (data.results.length === 0) {
+      setMovies(results);
+      if (results.length === 0) {
         toast('No movies found for your request.');
       }
     } catch (error) {
@@ -49,10 +50,10 @@ export default function App() {
   return (
     <>
       <SearchBar onSubmit={handleSearch} />
-      <Loader loader={loader} />
+      {loader && <Loader loader={loader} />}
       {movies.length > 0 ? <MovieGrid movies={movies} onSelect={openModal} /> : <Toaster />}
-      <ErrorMessage error={error} />
-      {isModalOpen && <MovieModal src={''} onClose={closeModal} />}
+      {error && <ErrorMessage error={error} />}
+      {isModalOpen && selectedMovie && <MovieModal movie={selectedMovie} onClose={closeModal} />}
       <Toaster />
     </>
   )

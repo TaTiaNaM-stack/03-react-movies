@@ -54,7 +54,6 @@ export default function App() {
       {movies.length > 0 ? <MovieGrid movies={movies} onSelect={openModal} /> : <Toaster />}
       {error && <ErrorMessage error={error} />}
       {isModalOpen && selectedMovie && <MovieModal movie={selectedMovie} onClose={closeModal} />}
-      <Toaster />
     </>
   )
 }

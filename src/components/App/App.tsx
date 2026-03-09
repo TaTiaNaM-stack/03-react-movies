@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.module.css'
-import type { Movie } from '../types/movie'
+import type { Movie } from '../../types/movie'
 import axios from 'axios'
 import SearchBar from '../SearchBar/SearchBar';
 import MovieGrid from '../MovieGrid/MovieGrid';
